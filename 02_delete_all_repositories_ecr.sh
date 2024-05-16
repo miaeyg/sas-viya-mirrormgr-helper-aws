@@ -5,8 +5,8 @@
 #
 
 ## change here
-#AWS_EXTRA=--profile default
-#AWS_EXTRA=--region il-central-1
+# AWS_CLI_PARMS=--profile default
+# AWS_CLI_PARMS=--region il-central-1
 AWS_CLI_PARMS=
 
 for repName in $(aws ecr describe-repositories $AWS_CLI_PARMS --no-cli-pager  | jq -r '.repositories[].repositoryName')
