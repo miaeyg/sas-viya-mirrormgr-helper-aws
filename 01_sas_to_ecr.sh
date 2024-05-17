@@ -46,18 +46,18 @@ export RELEASE=${arrASSETSFILE[5]}
 
 # reusable functions
 estimate() {
-    echo "Size estimate for SAS Repo: (can take a while)"
+    echo "Size estimate for SAS repo ${MIRRORPATH} (can take a while)."
     ${MIRRORMGRPATH}/mirrormgr list remote repos size --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE}
 }
 
 download() {
-    echo "Downloading repo."
+    echo "Downloading SAS repo to ${MIRRORPATH}. Writing to log file mm_download.log"
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers 10 --log-file mm_download.log
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mm_download.log
 }
 
 verify() {
-    echo "Verifying repo."
+    echo "Verifying repo ${MIRRORPATH}. Writing to log file mm_verify.log"
     ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mm_verify.log
     echo "==================="
     echo "Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
@@ -74,7 +74,7 @@ upload_step1() {
 }
 
 upload_step2() {
-    echo "Uploading repo step2 uploading images."
+    echo "Uploading repo step2 uploading images. Writing to log file mm_upload.log"
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mm_upload.log
 }
 
