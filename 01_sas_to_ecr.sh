@@ -44,17 +44,20 @@ export CADENCE=${arrASSETSFILE[3]}
 export VERSION=${arrASSETSFILE[4]}
 export RELEASE=${arrASSETSFILE[5]}
 
+# reusable functions
 estimate() {
     echo "Size estimate for SAS Repo: (can take a while)"
     ${MIRRORMGRPATH}/mirrormgr list remote repos size --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE}
 }
 
 download() {
+    echo "Downloading repo."
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers 10 --log-file mm_download.log
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mm_download.log
 }
 
 verify() {
+    echo "Verifying repo."
     ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mm_verify.log
     echo "==================="
     echo "Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
@@ -63,6 +66,7 @@ verify() {
 }
 
 upload_step1() {
+    echo "Uploading repo step1 creating ECR repos."
     for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
         echo "Working on SAS repo: $repo"
         aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo
@@ -70,9 +74,11 @@ upload_step1() {
 }
 
 upload_step2() {
+    echo "Uploading repo step2 uploading images."
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mm_upload.log
 }
 
+# act upon user passed argument
 case $1 in
   "estimate")
     estimate
@@ -95,6 +101,6 @@ case $1 in
     upload_step2
     ;;
   *)
-    echo "Usage: 01_sas_to_ecr.sh estimate/download/upload"    
+    echo "Usage: 01_sas_to_ecr.sh [estimate|download|verify|upload|upload_step1|upload_step2]"    
     ;;
 esac
