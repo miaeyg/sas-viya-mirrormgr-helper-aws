@@ -53,7 +53,7 @@ if [ "$1" == "estimate" ]; then
 # download
 elif [ "$1" == "download" ]; then
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers 10 --log-file mm_download.log
-    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers 10 --log-file mm_download.log
+    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mm_download.log
     ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mm_verify.log
     echo "==================="
     echo "Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
@@ -66,7 +66,7 @@ elif [ "$1" == "upload" ]; then
         echo "Working on SAS repo: $repo"
         aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo
     done
-   ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers 10 --log-file mm_upload.log
+   ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mm_upload.log
 
 # upload_step1
 elif [ "$1" == "upload_step1" ]; then
@@ -77,7 +77,7 @@ elif [ "$1" == "upload_step1" ]; then
 
 # upload_step2
 elif [ "$1" == "upload_step2" ]; then
-   ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers 10 --log-file mm_upload.log
+   ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mm_upload.log
 
 #elif [ "$1" == "all" ]; then
    #${MIRRORMGRPATH}/mirrormgr mirror registry -path "${MIRRORPATH}" --deployment-data "${ASSETSPATH}/${CERTSFILE}" --deployment-assets "${ASSETSPATH}/${ASSETSFILE}" --destination "${ECRURL}/${NS}" --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)
