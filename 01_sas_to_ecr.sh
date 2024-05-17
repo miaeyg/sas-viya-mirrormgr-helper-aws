@@ -44,46 +44,57 @@ export CADENCE=${arrASSETSFILE[3]}
 export VERSION=${arrASSETSFILE[4]}
 export RELEASE=${arrASSETSFILE[5]}
 
-
-# estimate
-if [ "$1" == "estimate" ]; then
+estimate() {
     echo "Size estimate for SAS Repo: (can take a while)"
     ${MIRRORMGRPATH}/mirrormgr list remote repos size --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE}
+}
 
-# download
-elif [ "$1" == "download" ]; then
+download() {
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers 10 --log-file mm_download.log
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mm_download.log
+}
+
+verify() {
     ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mm_verify.log
     echo "==================="
     echo "Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
     ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}
     echo "==================="
+}
 
-# upload
-elif [ "$1" == "upload" ]; then
+upload_step1() {
     for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
         echo "Working on SAS repo: $repo"
         aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo
     done
-   ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mm_upload.log
+}
 
-# upload_step1
-elif [ "$1" == "upload_step1" ]; then
-    for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
-        echo "Working on SAS repo: $repo"
-        aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo
-    done
+upload_step2() {
+    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mm_upload.log
+}
 
-# upload_step2
-elif [ "$1" == "upload_step2" ]; then
-   ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mm_upload.log
-
-#elif [ "$1" == "all" ]; then
-   #${MIRRORMGRPATH}/mirrormgr mirror registry -path "${MIRRORPATH}" --deployment-data "${ASSETSPATH}/${CERTSFILE}" --deployment-assets "${ASSETSPATH}/${ASSETSFILE}" --destination "${ECRURL}/${NS}" --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)
-   #${MIRRORMGRPATH}/mirrormgr mirror registry -path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)
-
-# otherwise
-else
+case $1 in
+  "estimate")
+    estimate
+    ;;
+  "download")
+    download
+    verify
+    ;;
+  "verify")
+    verify 
+    ;;
+  "upload")
+    upload_step1
+    upload_step2
+    ;;
+  "upload_step1")
+    upload_step1
+    ;;
+  "upload_step2")
+    upload_step2
+    ;;
+  *)
     echo "Usage: 01_sas_to_ecr.sh estimate/download/upload"    
-fi
+    ;;
+esac
