@@ -1,14 +1,20 @@
 #!/bin/bash
 
 #
-# This script needs to be executed several times as for some unknown reason it does not delete all in 1 go
+# This script can be executed several times if for some unknown reason it does not delete all in 1 go
+#
+# PREREQUISITES:
+# 1. AWS CLI
+# 2. jq
 #
 
-## change here
-# AWS_CLI_PARMS=--profile default
-# AWS_CLI_PARMS=--region il-central-1
 AWS_CLI_PARMS=
 
+## examples of additional parameters passed in to AWS CLI
+# AWS_CLI_PARMS=--profile default
+# AWS_CLI_PARMS=--region il-central-1
+
+# loop on all ECR repos and delete them
 for repName in $(aws ecr describe-repositories $AWS_CLI_PARMS --no-cli-pager  | jq -r '.repositories[].repositoryName')
 do
     echo "Deleting repo: $repName"
