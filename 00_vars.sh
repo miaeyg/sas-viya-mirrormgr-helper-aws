@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export ECRURL=https://<accountid>.dkr.ecr.<region>.amazonaws.com
-export ASSETSPATH=<path-to-SAS-certs-and-assets-files>
+export ASSETSPATH=<path-to-folder-containing-SAS-certs-and-assets-files>
 export ASSETSFILE=SASViyaV4_<order>_0_<order-info>.tgz
 export CERTSFILE=SASViyaV4_<order>_certs.zip
 export MIRRORPATH=<path-to-downloaded-images>

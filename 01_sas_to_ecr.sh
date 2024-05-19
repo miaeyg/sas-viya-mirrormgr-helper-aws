@@ -46,44 +46,45 @@ export RELEASE=${arrASSETSFILE[5]}
 
 # reusable functions
 estimate() {
-    echo "==================="
+    echo "==============================================="
     echo "Mirror Manager Helper: Size estimate for SAS repo ${MIRRORPATH} (can take a while)."
     ${MIRRORMGRPATH}/mirrormgr list remote repos size --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE}
-    echo "==================="
+    echo "==============================================="
 }
 
 download() {
-    echo "==================="
+    echo "==============================================="
     echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}. Writing to log file mmh_download.log"
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers ${WORKERS} --log-file mmh_download.log
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download.log
-    echo "==================="
+    echo "==============================================="
 }
 
 verify() {
-    echo "==================="
+    echo "==============================================="
     echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}. Writing to log file mmh_verify.log"
     ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mmh_verify.log    
+    echo "==============================================="
     echo "Mirror Manager Helper: Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
     ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}
-    echo "==================="
+    echo "==============================================="
 }
 
 upload_step1() {
-    echo "==================="
+    echo "==============================================="
     echo "Mirror Manager Helper: Uploading repo step1 creating ECR repos."
     for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
         echo "Working on SAS repo: $repo"
         aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo
     done
-    echo "==================="
+    echo "==============================================="
 }
 
 upload_step2() {
-    echo "==================="
+    echo "==============================================="
     echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file mmh_upload.log"
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mmh_upload.log
-    echo "==================="
+    echo "==============================================="
 }
 
 # act upon user passed argument
