@@ -22,6 +22,6 @@ tar -xvzf mirrormgr-linux.tgz
 
    you can split upload to two steps: upload_step1 which creates ECR repos / upload_step2 which uploads SAS docker images to ECR repos
 
-5. Run 02_delete_all_repositories_ecr.sh to cleanup ECR by deleting all ECR repos
+5. Run 99_delete_all_repositories_ecr.sh to cleanup ECR by deleting all ECR repos
 
 
