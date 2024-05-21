@@ -56,14 +56,14 @@ download() {
     echo "==============================================="
     echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}. Writing to log file mmh_download.log"
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers ${WORKERS} --log-file mmh_download.log
-    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_$(date "+%T").log
+    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_$(date "+%Y%M%d%T").log
     echo "==============================================="
 }
 
 verify() {
     echo "==============================================="
     echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}. Writing to log file mmh_verify.log"
-    ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mmh_verify_$(date "+%T").log    
+    ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mmh_verify_$(date "+%Y%M%d%T").log    
     echo "==============================================="
     echo "Mirror Manager Helper: Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
     ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}
@@ -83,7 +83,7 @@ upload_step1() {
 upload_step2() {
     echo "==============================================="
     echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file mmh_upload.log"
-    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mmh_upload_$(date "+%T").log
+    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --workers ${WORKERS} --log-file mmh_upload_$(date "+%Y%M%d%T").log
     echo "==============================================="
 }
 
