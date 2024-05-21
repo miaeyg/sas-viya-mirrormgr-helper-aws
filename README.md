@@ -16,7 +16,7 @@ wget https://support.sas.com/installation/viya/4/sas-mirror-manager/lax/mirrormg
 tar -xvzf mirrormgr-linux.tgz
 ```
 
-2. chmod u+x *
+2. chmod u+x *.sh
 3. Edit 00_vars.sh
 4. Run 01_sas_to_ecr.sh [estimate|download|verify|upload|upload_step1|upload_step2]
 
