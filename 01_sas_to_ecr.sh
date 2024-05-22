@@ -44,6 +44,10 @@ export CADENCE=${arrASSETSFILE[3]}
 export VERSION=${arrASSETSFILE[4]}
 export RELEASE=${arrASSETSFILE[5]}
 
+echo "CADENCE=${CADENCE}"
+echo "VERSION=${VERSION}"
+echo "RELEASe=${RELEASE}"
+
 # reusable functions
 estimate() {
     echo "==============================================="
