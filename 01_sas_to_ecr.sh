@@ -44,6 +44,7 @@ export CADENCE=${arrASSETSFILE[3]}
 export VERSION=${arrASSETSFILE[4]}
 export RELEASE=${arrASSETSFILE[5]}
 
+echo "==============================================="
 echo "CADENCE=${CADENCE}"
 echo "VERSION=${VERSION}"
 echo "RELEASE=${RELEASE}"
@@ -53,25 +54,22 @@ estimate() {
     echo "==============================================="
     echo "Mirror Manager Helper: Size estimate for SAS repo ${MIRRORPATH} (can take a while)."
     ${MIRRORMGRPATH}/mirrormgr list remote repos size --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE}
-    echo "==============================================="
 }
 
 download() {
     echo "==============================================="
     echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}. Writing to log file mmh_download.log"
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers ${WORKERS} --log-file mmh_download.log
-    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_$(date "+%Y%m%d:%T").log
-    echo "==============================================="
+    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_$(date "+%Y%m%d_%H%M%S").log
 }
 
 verify() {
     echo "==============================================="
     echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}. Writing to log file mmh_verify.log"
-    ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mmh_verify_$(date "+%Y%m%d:%T").log    
+    ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mmh_verify_$(date "+%Y%m%d_%H%M%S").log    
     echo "==============================================="
     echo "Mirror Manager Helper: Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
     ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}
-    echo "==============================================="
 }
 
 upload_step1() {
@@ -81,14 +79,12 @@ upload_step1() {
         echo "Working on SAS repo: $repo"
         aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo
     done
-    echo "==============================================="
 }
 
 upload_step2() {
     echo "==============================================="
     echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file mmh_upload.log"
-    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_upload_$(date "+%Y%m%d:%T").log
-    echo "==============================================="
+    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_upload_$(date "+%Y%m%d_%H%M%S").log
 }
 
 # act upon user passed argument
