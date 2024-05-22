@@ -5,7 +5,6 @@ Prerequisites:
 1. Linux
 2. AWS CLI
 3. SAS Mirror Manager
-4. jq (only for 99_delete_all_repositories_ecr.sh)
 
 
 Usage:
