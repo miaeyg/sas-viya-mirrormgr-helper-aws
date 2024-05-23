@@ -2,31 +2,7 @@
 
 source 00_vars.sh
 
-# https://documentation.sas.com/doc/en/itopscdc/v_045/dplyml0phy0dkr/p0lexw9inr33ofn1tbo69twarhlx.htm
-
-# download SAS mirrormgr from https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html
-# > wget https://support.sas.com/installation/viya/4/sas-mirror-manager/lax/mirrormgr-linux.tgz
-# > tar -xvzf mirrormgr-linux.tgz
-#
-# download AWS CLI and configure it "aws configure" or "aws configure sso" and get the profile name
-# create folder like so:
-#   /sas/<order>/stable-2024.04 or /sas/<order>/lts-2023.10
-
-#
-# Usage:
-#
-# 01_sas_to_ecr.sh estimate/download/upload
-#
-# typically one would execute: 
-#   "estimate" and make sure there is enough disk space to store repo
-#   "download" to download and verify sas_repo
-#   "upload" but before that login to aws 
-#
-#   "upload" can be split to "upload_step1" and "upload_step2"
-#   "upload_step1" creates the repositories in ECR should only be run once
-#   "upload_step2" uploads the SAS images to ECR can be run multiple times if aborted/stopped/failed
-#
-
+# verify required files exist before proceeding
 if [[ ! -f "${ASSETSPATH}/${CERTSFILE}" ]]; then
     echo "CERTSFILE does not exist."
     exit 1
@@ -49,13 +25,14 @@ echo "CADENCE=${CADENCE}"
 echo "VERSION=${VERSION}"
 echo "RELEASE=${RELEASE}"
 
-# reusable functions
+# estimate size of to be downloaded mirror
 estimate() {
     echo "==============================================="
     echo "Mirror Manager Helper: Size estimate for SAS repo ${MIRRORPATH} (can take a while)."
     ${MIRRORMGRPATH}/mirrormgr list remote repos size --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE}
 }
 
+# download SAS mirror
 download() {
     echo "==============================================="
     echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}. Writing to log file mmh_download.log"
@@ -63,6 +40,7 @@ download() {
     ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_$(date "+%Y%m%d_%H%M%S").log
 }
 
+# verify downloaded mirror and output downloaded release info 
 verify() {
     echo "==============================================="
     echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}. Writing to log file mmh_verify.log"
@@ -72,6 +50,7 @@ verify() {
     ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}
 }
 
+# get repo names from SAS and create equivalent repos in ECR
 upload_step1() {
     echo "==============================================="
     echo "Mirror Manager Helper: Uploading repo step1 creating ECR repos."
@@ -81,6 +60,7 @@ upload_step1() {
     done
 }
 
+# upload downloaded SAS images to ECR repos
 upload_step2() {
     echo "==============================================="
     echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file mmh_upload.log"
