@@ -66,19 +66,20 @@ verify() {
 }
 
 # get repo names from SAS and create equivalent repos in ECR
-upload_step1() {
-    common /dev/null
-    echo "==============================================="
-    echo "Mirror Manager Helper: Uploading repo step1 creating ECR repos."
+create_ecr_repos() {
+    LOGFILE="mmh_create_ecr_repos_${DT}.log"
+    common $LOGFILE
+    echo "===============================================" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Uploading repo step1 creating ECR repos." | tee -a ${LOGFILE}
     for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
-        echo "Working on SAS repo: $repo"
-        aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo
+        echo "Working on SAS repo: $repo" | tee -a ${LOGFILE}
+        (aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo) | tee -a ${LOGFILE}
     done
 }
 
 # upload downloaded SAS images to ECR repos
-upload_step2() {
-    LOGFILE="mmh_upload_${DT}.log"
+upload_to_ecr() {
+    LOGFILE="mmh_upload_to_ecr_${DT}.log"
     CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS}"
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
@@ -100,16 +101,16 @@ case $1 in
     verify 
     ;;
   "upload")
-    upload_step1
-    upload_step2
+    create_ecr_repos
+    upload_to_ecr
     ;;
-  "upload_step1")
-    upload_step1
+  "create_ecr_repos")
+    create_ecr_repos
     ;;
-  "upload_step2")
-    upload_step2
+  "upload_to_ecr")
+    upload_to_ecr
     ;;
   *)
-    echo "Usage: 01_sas_to_ecr.sh [estimate|download|verify|upload|upload_step1|upload_step2]"    
+    echo "Usage: 01_sas_to_ecr.sh [estimate|download|verify|upload|create_ecr_repos|upload_to_ecr]"    
     ;;
 esac
