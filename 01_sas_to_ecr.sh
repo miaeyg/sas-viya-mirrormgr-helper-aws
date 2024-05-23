@@ -39,12 +39,13 @@ estimate() {
 # download SAS mirror
 download() {
     LOGFILE="mmh_download_${DT}.log"
-    CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS}"
+    CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file ${LOGFILE}"
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
-    echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}. Writing to log file ${LOGFILE}" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}." | tee -a ${LOGFILE}
+    echo "Writing to log file ${LOGFILE}"
     echo "${CMD}" >> ${LOGFILE}
-    eval "${CMD} --log-file ${LOGFILE}"
+    eval "${CMD}"
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers ${WORKERS} --log-file mmh_download.log    
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_${DT}.log
 }
@@ -52,12 +53,13 @@ download() {
 # verify downloaded mirror and output downloaded release info 
 verify() {
     LOGFILE="mmh_verify_${DT}.log"
-    CMD="${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH}"
+    CMD="${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file ${LOGFILE}"
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
-    echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}. Writing to log file ${LOGFILE}" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}." | tee -a ${LOGFILE}
+    echo "Writing to log file ${LOGFILE}"
     echo "${CMD}" >> ${LOGFILE}
-    eval "${CMD} --log-file ${LOGFILE}"
+    eval "${CMD}"
     echo "===============================================" | tee -a ${LOGFILE}
     echo "Mirror Manager Helper: Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}" | tee -a ${LOGFILE}
     CMD="ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"
@@ -71,6 +73,7 @@ create_ecr_repos() {
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
     echo "Mirror Manager Helper: Uploading repo step1 creating ECR repos." | tee -a ${LOGFILE}
+    echo "Writing to log file ${LOGFILE}"
     for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
         echo "Working on SAS repo: $repo" | tee -a ${LOGFILE}
         (aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo) | tee -a ${LOGFILE}
@@ -78,14 +81,16 @@ create_ecr_repos() {
 }
 
 # upload downloaded SAS images to ECR repos
+# CMD intentionally does not include the --username and --password parameters to they can be masked
 upload_to_ecr() {
     LOGFILE="mmh_upload_to_ecr_${DT}.log"
-    CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS}"
+    CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file ${LOGFILE}"
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
-    echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file ${LOGFILE}" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Uploading repo step2 uploading images." | tee -a ${LOGFILE}
+    echo "Writing to log file ${LOGFILE}"
     echo "${CMD} --username 'AWS' --password <masked>" >> ${LOGFILE}
-    eval "${CMD} --log-file ${LOGFILE} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)"
+    eval "${CMD} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)"
 }
 
 # act upon user passed argument
