@@ -21,13 +21,16 @@ export VERSION=${arrASSETSFILE[4]}
 export RELEASE=${arrASSETSFILE[5]}
 export DT=$(date "+%Y%m%d_%H%M%S")
 
-echo "==============================================="
-echo "CADENCE=${CADENCE}"
-echo "VERSION=${VERSION}"
-echo "RELEASE=${RELEASE}"
+common() {
+  echo "===============================================" | tee -a $1
+  echo "CADENCE=${CADENCE}" | tee -a $1
+  echo "VERSION=${VERSION}" | tee -a $1
+  echo "RELEASE=${RELEASE}" | tee -a $1
+}
 
 # estimate size of to be downloaded mirror
 estimate() {
+    common /dev/null
     echo "==============================================="
     echo "Mirror Manager Helper: Size estimate for SAS repo ${MIRRORPATH} (can take a while)."
     ${MIRRORMGRPATH}/mirrormgr list remote repos size --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE}
@@ -35,24 +38,36 @@ estimate() {
 
 # download SAS mirror
 download() {
-    echo "==============================================="
-    echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}. Writing to log file mmh_download_${DT}.log"
-    #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers ${WORKERS} --log-file mmh_download.log
-    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_${DT}.log
+    LOGFILE="mmh_download_${DT}.log"
+    CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS}"
+    common $LOGFILE
+    echo "===============================================" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Downloading SAS repo to ${MIRRORPATH}. Writing to log file ${LOGFILE}" | tee -a ${LOGFILE}
+    echo "${CMD}" >> ${LOGFILE}
+    eval "${CMD} --log-file ${LOGFILE}"
+    #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers ${WORKERS} --log-file mmh_download.log    
+    #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_${DT}.log
 }
 
 # verify downloaded mirror and output downloaded release info 
 verify() {
-    echo "==============================================="
-    echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}. Writing to log file mmh_verify_${DT}.log"
-    ${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH} --log-file mmh_verify_${DT}.log    
-    echo "==============================================="
-    echo "Mirror Manager Helper: Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"    
-    ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}
+    LOGFILE="mmh_verify_${DT}.log"
+    CMD="${MIRRORMGRPATH}/mirrormgr verify registry --path ${MIRRORPATH}"
+    common $LOGFILE
+    echo "===============================================" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Verifying repo ${MIRRORPATH}. Writing to log file ${LOGFILE}" | tee -a ${LOGFILE}
+    echo "${CMD}" >> ${LOGFILE}
+    eval "${CMD} --log-file ${LOGFILE}"
+    echo "===============================================" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Downloaded release verification: ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}" | tee -a ${LOGFILE}
+    CMD="ls -l ${MIRRORPATH}/lod/${CADENCE}/${VERSION}"
+    echo "${CMD} >> ${LOGFILE}"
+    eval "${CMD} | tee -a ${LOGFILE}"
 }
 
 # get repo names from SAS and create equivalent repos in ECR
 upload_step1() {
+    common /dev/null
     echo "==============================================="
     echo "Mirror Manager Helper: Uploading repo step1 creating ECR repos."
     for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
@@ -63,9 +78,13 @@ upload_step1() {
 
 # upload downloaded SAS images to ECR repos
 upload_step2() {
-    echo "==============================================="
-    echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file mmh_upload_${DT}.log"
-    ${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS) --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_upload_${DT}.log
+    LOGFILE="mmh_upload_${DT}.log"
+    CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS}"
+    common $LOGFILE
+    echo "===============================================" | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file ${LOGFILE}" | tee -a ${LOGFILE}
+    echo "${CMD}" >> ${LOGFILE}
+    eval "${CMD} --log-file ${LOGFILE} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)"
 }
 
 # act upon user passed argument
