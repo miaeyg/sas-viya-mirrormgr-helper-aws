@@ -84,7 +84,7 @@ upload_to_ecr() {
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
     echo "Mirror Manager Helper: Uploading repo step2 uploading images. Writing to log file ${LOGFILE}" | tee -a ${LOGFILE}
-    echo "${CMD}" >> ${LOGFILE}
+    echo "${CMD} --username 'AWS' --password <masked>" >> ${LOGFILE}
     eval "${CMD} --log-file ${LOGFILE} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)"
 }
 
