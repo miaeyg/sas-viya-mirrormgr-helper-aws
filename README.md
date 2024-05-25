@@ -8,13 +8,13 @@ The scripts maintain log files for each action performed in the Logs directory.
 
 ### Prerequisites:
 1. Linux
-2. AWS CLI
-3. SAS Mirror Manager
+2. AWS CLI installed and authenticated to AWS
+3. SAS Mirror Manager 
 
 
 ### Usage:
 
-1. download SAS mirrormgr either from https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html or like this:
+1. Download SAS mirrormgr either from https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html or via commands:
 ```
 wget https://support.sas.com/installation/viya/4/sas-mirror-manager/lax/mirrormgr-linux.tgz
 tar -xvzf mirrormgr-linux.tgz
