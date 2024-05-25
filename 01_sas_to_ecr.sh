@@ -71,13 +71,13 @@ verify() {
 create_ecr_repos() {
     aws sts get-caller-identity > /dev/null 2>&1
     if [ $? -ne 0 ]; then
-       echo "Error: AWS is not authenticated to AWS. Exiting."
+       echo "Error: AWS CLI is not authenticated to AWS, fix and re-run. Exiting."
        exit 1
     fi
     LOGFILE="Logs/mmh_create_ecr_repos_${DT}.log"
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
-    echo "Mirror Manager Helper: Uploading repo step1 creating ECR repos." | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Creating ECR repos." | tee -a ${LOGFILE}
     echo "Writing to log file ${LOGFILE}"
     for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
         echo "Working on SAS repo: $repo" | tee -a ${LOGFILE}
@@ -90,14 +90,14 @@ create_ecr_repos() {
 upload_to_ecr() {
     aws sts get-caller-identity > /dev/null 2>&1
     if [ $? -ne 0 ]; then
-       echo "Error: AWS is not authenticated to AWS. Exiting."
+       echo "Error: AWS CLI is not authenticated to AWS, fix and re-run. Exiting."
        exit 1
     fi
     LOGFILE="Logs/mmh_upload_to_ecr_${DT}.log"
     CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file ${LOGFILE}"
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
-    echo "Mirror Manager Helper: Uploading repo step2 uploading images." | tee -a ${LOGFILE}
+    echo "Mirror Manager Helper: Uploading SAS docker images to ECR repos." | tee -a ${LOGFILE}
     echo "Writing to log file ${LOGFILE}"
     echo "${CMD} --username 'AWS' --password <masked>" >> ${LOGFILE}
     eval "${CMD} --username 'AWS' --password $(aws ecr get-login-password $AWS_CLI_PARMS)"
