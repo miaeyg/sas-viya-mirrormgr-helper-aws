@@ -1,6 +1,6 @@
 # sas-viya-mirrormgr-helper-aws
 
-![Static Badge](https://img.shields.io/badge/license-MIT-blue?style=plastic)
+![Static Badge](https://img.shields.io/badge/license-MIT-blue)
 
 
 This project contains scripts which assist in downloading and uploading SAS Viya4 docker images to AWS private ECR the using SAS Mirror Manager utility and also in cleaning up the ECR repositories.
@@ -8,14 +8,15 @@ The scripts maintain log files for each action performed in the Logs directory.
 
 ### Prerequisites:
 1. Linux
-2. AWS CLI installed and authenticated to AWS
+2. AWS CLI
 3. SAS Mirror Manager 
 
 
 ### Installation:
 
-1. Download [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-2. Download [SAS Mirror Manager](https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html) or via commands:
+1. Git clone this project 
+2. Download [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+3. Download [SAS Mirror Manager](https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html) or via commands:
 ```
 wget https://support.sas.com/installation/viya/4/sas-mirror-manager/lax/mirrormgr-linux.tgz
 tar -xvzf mirrormgr-linux.tgz
