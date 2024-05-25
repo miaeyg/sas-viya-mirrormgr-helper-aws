@@ -1,6 +1,6 @@
 # sas-viya-mirrormgr-helper-aws
 
-![Static Badge](https://img.shields.io/badge/license-MIT-blue)![GitHub Tag](https://img.shields.io/github/v/tag/miaeyg/sas-viya-mirrormgr-helper-aws?color=green)
+![Static Badge](https://img.shields.io/badge/license-MIT-blue) ![GitHub Tag](https://img.shields.io/github/v/tag/miaeyg/sas-viya-mirrormgr-helper-aws?color=green)
 
 
 
