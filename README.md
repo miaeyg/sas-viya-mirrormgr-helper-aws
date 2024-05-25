@@ -1,6 +1,7 @@
 # sas-viya-mirrormgr-helper-aws
 
-![Static Badge](https://img.shields.io/badge/license-MIT-blue)
+![Static Badge](https://img.shields.io/badge/license-MIT-blue)![GitHub Tag](https://img.shields.io/github/v/tag/miaeyg/sas-viya-mirrormgr-helper-aws?color=green)
+
 
 
 This project contains scripts which assist in downloading and uploading SAS Viya4 docker images to AWS private ECR the using SAS Mirror Manager utility and also in cleaning up the ECR repositories.
