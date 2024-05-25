@@ -69,6 +69,11 @@ verify() {
 
 # get repo names from SAS and create equivalent repos in ECR
 create_ecr_repos() {
+    aws sts get-caller-identity > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+       echo "Error: AWS is not authenticated to AWS. Exiting."
+       exit 1
+    fi
     LOGFILE="Logs/mmh_create_ecr_repos_${DT}.log"
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
@@ -83,6 +88,11 @@ create_ecr_repos() {
 # upload downloaded SAS images to ECR repos
 # CMD intentionally does not include the --username and --password parameters to they can be masked
 upload_to_ecr() {
+    aws sts get-caller-identity > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+       echo "Error: AWS is not authenticated to AWS. Exiting."
+       exit 1
+    fi
     LOGFILE="Logs/mmh_upload_to_ecr_${DT}.log"
     CMD="${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${ECRURL}/${NS} --push-only --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file ${LOGFILE}"
     common $LOGFILE
