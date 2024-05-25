@@ -24,9 +24,14 @@ tar -xvzf mirrormgr-linux.tgz
 
 1. Authenticate to AWS using AWS CLI
 2. Run `chmod u+x *.sh`
-3. Edit `00_vars.sh`
+3. Edit [00_vars.sh](00_vars.sh)
 4. Run `01_sas_to_ecr.sh [estimate|download|verify|upload|create_ecr_repos|upload_to_ecr]`
 
-   you can split upload to two steps: create_ecr_repos which creates ECR repos / upload_to_ecr which uploads SAS docker images to ECR repos
-
+   estimate = estimate the disk size for downloading SAS docker images  
+   download = downloads and verifies the downloades images  
+   verify = verifies the downloaded images  
+   upload = creates ECR repos and uploads SAS images to those repos  
+   create_ecr_repos = creates ECR repos  
+   upload_to_ecr = uploads SAS images to ECR repos  
+   
 5. Run `99_delete_sas_repositories_ecr.sh` to cleanup ECR by deleting all SAS Mirror Manager uploaded ECR repos
