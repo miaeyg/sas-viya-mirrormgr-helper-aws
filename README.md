@@ -16,6 +16,7 @@ The scripts maintain log files for each action performed in the Logs directory.
 ### Installation:
 
 1. Clone this project or download zip/tar file from a tag version and extract it
+2. Obtain the SAS Viya assets for your order from [my.sas.com](https://my.sas.com) or using [viya4-orders-cli](https://github.com/sassoftware/viya4-orders-cli) 
 2. Download [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 3. Download [SAS Mirror Manager](https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html) or via commands:
 ```
