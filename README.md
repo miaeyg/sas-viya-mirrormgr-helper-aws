@@ -20,6 +20,8 @@ The scripts maintain log files for each action performed in the Logs directory.
 2. Download [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 3. Download SAS Mirror Manager from [SAS Mirror Manager](https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html) or use the following commands:
 ```
+mkdir mirrormgr
+cd mirrormgr
 wget https://support.sas.com/installation/viya/4/sas-mirror-manager/lax/mirrormgr-linux.tgz
 tar -xvzf mirrormgr-linux.tgz
 ```
