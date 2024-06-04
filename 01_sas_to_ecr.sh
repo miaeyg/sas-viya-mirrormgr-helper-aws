@@ -46,6 +46,7 @@ download() {
     echo "Writing to log file ${LOGFILE}"
     echo "${CMD}" >> ${LOGFILE}
     eval "${CMD}"
+    $MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS} > sas_repos_${CADENCE}_${VERSION}_${RELEASE}.txt
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --deployment-assets ${ASSETSPATH}/${ASSETSFILE} --workers ${WORKERS} --log-file mmh_download.log    
     #${MIRRORMGRPATH}/mirrormgr mirror registry --path ${MIRRORPATH} --deployment-data ${ASSETSPATH}/${CERTSFILE} --cadence ${CADENCE}-${VERSION} --release ${RELEASE} --workers ${WORKERS} --log-file mmh_download_${DT}.log
 }
@@ -78,11 +79,12 @@ create_ecr_repos() {
     common $LOGFILE
     echo "===============================================" | tee -a ${LOGFILE}
     echo "Mirror Manager Helper: Creating ECR repos." | tee -a ${LOGFILE}
-    echo "Writing to log file ${LOGFILE}"
-    for repo in $($MIRRORMGRPATH/mirrormgr list target docker repos --deployment-data ${ASSETSPATH}/${CERTSFILE} --destination ${NS}) ; do
+    echo "Writing to log file ${LOGFILE}"        
+    echo "Creating $(cat sas_repos_${CADENCE}_${VERSION}_${RELEASE}.txt | wc -l) repos in ECR"
+    while read repo; do
         echo "Working on SAS repo: $repo" | tee -a ${LOGFILE}
         (aws ecr describe-repositories $AWS_CLI_PARMS --repository-names $repo || aws ecr create-repository $AWS_CLI_PARMS --repository-name $repo) | tee -a ${LOGFILE}
-    done
+    done < sas_repos_${CADENCE}_${VERSION}_${RELEASE}.txt
 }
 
 # upload downloaded SAS images to ECR repos
