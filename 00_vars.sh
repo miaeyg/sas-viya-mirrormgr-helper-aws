@@ -12,11 +12,11 @@ export ASSETSFILE=SASViyaV4_<order>_0_<order-info>.tgz
 # SAS Certs file name
 export CERTSFILE=SASViyaV4_<order>_certs.zip
 
-# path to directory where downloaded SAS Docker Images will be kept
-export MIRRORPATH=<path-to-directory-to-contain-downloaded-images>
-
 # path to directory where SAS Mirror Manager is installed
 export MIRRORMGRPATH=<path-to-folder-containing-SAS-mirrormgr-executable>
+
+# path to directory where downloaded SAS Docker Images will be kept
+export DOWNLOADPATH=<path-to-directory-to-contain-downloaded-images>
 
 # name of namespace in ECR underwhich the images will be uploaded for example "viya/..."
 export NS=viya
