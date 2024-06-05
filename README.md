@@ -4,8 +4,8 @@
 
 
 
-This project contains scripts which assist in downloading and uploading SAS Viya4 docker images to AWS private ECR in dark sites the using SAS Mirror Manager utility.
-Allows easy clean up of the ECR repositories.
+This project contains scripts which assist in downloading and uploading SAS Viya4 docker images to AWS private ECR in dark (air gapped) sites using SAS Mirror Manager utility.
+Allows easy clean up of the ECR repositories created for SAS Viya4.
 
 The scripts maintain log files for each action performed in the Logs directory.
 
