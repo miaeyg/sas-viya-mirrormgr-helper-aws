@@ -4,7 +4,9 @@
 
 
 
-This project contains scripts which assist in downloading and uploading SAS Viya4 docker images to AWS private ECR the using SAS Mirror Manager utility and also in cleaning up the ECR repositories.
+This project contains scripts which assist in downloading and uploading SAS Viya4 docker images to AWS private ECR in dark sites the using SAS Mirror Manager utility.
+Allows easy clean up of the ECR repositories.
+
 The scripts maintain log files for each action performed in the Logs directory.
 
 ### Prerequisites:
@@ -15,28 +17,34 @@ The scripts maintain log files for each action performed in the Logs directory.
 
 ### Installation:
 
-1. Clone this project or download the latest tagged version
+1. Clone this project or download the latest tagged version to both a public machine and an private machine with access to AWS Private ECR
 2. Obtain the SAS Viya assets for your order from [my.sas.com](https://my.sas.com) or using [viya4-orders-cli](https://github.com/sassoftware/viya4-orders-cli) 
-2. Download [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-3. Download SAS Mirror Manager from [SAS Mirror Manager](https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html) or use the following commands:
+2. Install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) on the internl machine
+3. Download SAS Mirror Manager from [SAS Mirror Manager](https://support.sas.com/en/documentation/install-center/viya/deployment-tools/4/mirror-manager.html) or use the following commands on both public and private machines:
 ```
 mkdir mirrormgr
 cd mirrormgr
 wget https://support.sas.com/installation/viya/4/sas-mirror-manager/lax/mirrormgr-linux.tgz
 tar -xvzf mirrormgr-linux.tgz
 ```
+4. Run `chmod u+x *.sh`
+
 ### Usage:
 
-1. Authenticate to AWS using AWS CLI
-2. Run `chmod u+x *.sh`
-3. Edit [00_vars.sh](00_vars.sh)
-4. Run `01_sas_to_ecr.sh [estimate|download|verify|upload|create_ecr_repos|upload_to_ecr]`
+1. Edit [00_vars.sh](00_vars.sh)
+2. On the public machine run `01_sas_to_ecr.sh download`
+3. Transfer the downloaded folder to the internal machine
+4. On the private machine authenticate to AWS using AWS CLI
+5. On the private machine run `01_sas_to_ecr.sh upload`
+6. On the private machine run `99_delete_sas_repositories_ecr.sh` to cleanup ECR by deleting all SAS Mirror Manager uploaded ECR repos
 
-   estimate = estimate the disk size for downloading SAS docker images  
-   download = downloads and verifies the downloades images  
-   verify = verifies the downloaded images  
-   upload = creates ECR repos and uploads SAS images to those repos  
-   create_ecr_repos = creates ECR repos  
-   upload_to_ecr = uploads SAS images to ECR repos  
-   
-5. Run `99_delete_sas_repositories_ecr.sh` to cleanup ECR by deleting all SAS Mirror Manager uploaded ECR repos
+### Help:
+
+List of options for executing the script:
+
+   - estimate = estimate the disk size for downloading SAS docker images  
+   - download = downloads and verifies the downloades images  
+   - verify = verifies the downloaded images  
+   - upload = creates ECR repos and uploads SAS images to those repos  
+   - create_ecr_repos = creates ECR repos  
+   - upload_to_ecr = uploads SAS images to ECR repos  
