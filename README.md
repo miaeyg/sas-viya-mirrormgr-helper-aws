@@ -43,8 +43,8 @@ tar -xvzf mirrormgr-linux.tgz
 List of options for executing the script:
 
    - estimate = estimate the disk size for downloading SAS docker images  
-   - download = downloads and verifies the downloades images  
-   - verify = verifies the downloaded images  
-   - upload = creates ECR repos and uploads SAS images to those repos  
+   - download = downloads _and_ verifies the downloades images  
+   - verify = just verifies the downloaded images  
+   - upload = creates ECR repos _and_ uploads SAS images to those repos  (performs the _create_ecr_repos_ and _upload_to_ecr_ actions)
    - create_ecr_repos = creates ECR repos  
    - upload_to_ecr = uploads SAS images to ECR repos  
