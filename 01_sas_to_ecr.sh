@@ -21,6 +21,16 @@ export VERSION=${arrASSETSFILE[4]}
 export RELEASE=${arrASSETSFILE[5]}
 export DT=$(date "+%Y%m%d_%H%M%S")
 
+# helper function to check if AWS CLI is authenticated or not
+verify_aws_auth() {
+    aws sts get-caller-identity > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+       echo "Error: AWS CLI is not authenticated to AWS, fix and re-run. Exiting."
+       exit 1
+    fi
+}
+
+# helper funtions with common output 
 common() {
   echo "===============================================" | tee -a $1
   echo "CADENCE=${CADENCE}" | tee -a $1
@@ -69,13 +79,6 @@ verify() {
     eval "${CMD} | tee -a ${LOGFILE}"
 }
 
-verify_aws_auth() {
-    aws sts get-caller-identity > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
-       echo "Error: AWS CLI is not authenticated to AWS, fix and re-run. Exiting."
-       exit 1
-    fi
-}
 # get repo names from SAS and create equivalent repos in ECR
 create_ecr_repos() {
     verify_aws_auth
